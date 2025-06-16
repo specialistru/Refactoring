@@ -6,24 +6,26 @@
 #include <time.h>
 
 #define MAX_LINE_LEN 1024
-#define MAX_CHECKS 10
+#define MAX_CHECKS 1000
 #define MAX_PATH_LEN 260
 #define MAX_LOG_BUFFER 8192
 
-// Прототипы функций проверок
-int after_example_0001(const char* line, char* advice, size_t advice_len);
-int after_example_0002(const char* line, char* advice, size_t advice_len);
+// Определения прототипов
+#define X(fn) int fn(const char* line, char* advice, size_t advice_len);
+#include "check_registry.def"
+#undef X
 
 // Тип функции
 typedef int (*CheckFunc)(const char*, char*, size_t);
 
-CheckFunc checks_array[MAX_CHECKS] = {
-    after_example_0001, after_example_0002,
-    after_example_0003, after_example_0004,
-    after_example_0005, after_example_0006,
-    after_example_0007, after_example_0008,
-    after_example_0009, after_example_0010
+// Массив указателей
+#define X(fn) fn,
+CheckFunc checks_array[] = {
+    #include "check_registry.def"
 };
+#undef X
+
+#define NUM_CHECKS (sizeof(checks_array) / sizeof(checks_array[0]))
 
 // ====================== ЛОГИРОВАНИЕ =========================
 
