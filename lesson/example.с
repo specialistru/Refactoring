@@ -1,1 +1,2642 @@
+#include <stdio.h>
+#include <time.h>
 
+// Функция для подсчёта разницы времени в наносекундах
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0001() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 0; i < 10; i++) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0001() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 0; i < 10; ++i) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+В данном примере для измерения производительности используется функция clock_gettime с CLOCK_MONOTONIC, позволяющая получить точное время в наносекундах.
+Рефакторинг упрощает цикл и улучшает читаемость без значительного влияния на скорость.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0002() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 10;
+    int b = 20;
+    int max;
+    if (a > b) {
+        max = a;
+    } else {
+        max = b;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Max: %d\n", max);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0002() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 10;
+    int b = 20;
+    int max = (a > b) ? a : b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Max: %d\n", max);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг заменяет конструкцию if-else на тернарный оператор, что упрощает код и повышает читаемость.
+Измерения времени показывают минимальную разницу из-за незначительной вычислительной нагрузки.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0003() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5];
+    for (int i = 0; i < 5; i++) {
+        arr[i] = 0;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0003() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5];
+    memset(arr, 0, sizeof(arr));
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Использование memset вместо цикла уменьшает количество кода и может увеличить производительность за счёт оптимизаций библиотеки.
+Измерения показывают, что memset обычно быстрее при инициализации больших массивов.
+Оценка кода до рефакторинга: 5/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0004() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("a = %d, b = %d\n", a, b);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0004() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    a ^= b;
+    b ^= a;
+    a ^= b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("a = %d, b = %d\n", a, b);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг заменяет временную переменную на XOR-своп, уменьшая использование памяти.
+Временные замеры показывают минимальную разницу, но код становится компактнее.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+void before_example0005() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 5;
+    int factorial_result = 1;
+    for (int i = 1; i <= n; i++) {
+        factorial_result *= i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Factorial: %d\n", factorial_result);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0005() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 5;
+    int factorial_result = factorial(n);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Factorial: %d\n", factorial_result);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг заменяет итеративный цикл рекурсивной функцией, улучшая модульность и читаемость.
+Измерения показывают, что для маленьких n разница по времени минимальна.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0006() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    if (x > 0) {
+        printf("Positive\n");
+    } else {
+        printf("Non-positive\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0006() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    printf("%s\n", (x > 0) ? "Positive" : "Non-positive");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг упрощает условный вывод с помощью тернарного оператора, улучшая читаемость.
+Разница во времени невелика из-за простоты задачи.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int sum_array(const int* arr, int size) {
+    int sum = 0;
+    for (int i = 0; i < size; ++i) {
+        sum += arr[i];
+    }
+    return sum;
+}
+
+void before_example0007() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5] = {1, 2, 3, 4, 5};
+    int sum = 0;
+    for (int i = 0; i < 5; i++) {
+        sum += arr[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0007() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5] = {1, 2, 3, 4, 5};
+    int sum = sum_array(arr, 5);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Вынесение суммирования массива в отдельную функцию улучшает повторное использование и модульность кода.
+Временные измерения почти не изменяются.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0008() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (x == 0) {
+        printf("Zero\n");
+    }
+    if (x != 0) {
+        printf("Non-zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0008() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (x == 0) {
+        printf("Zero\n");
+    } else {
+        printf("Non-zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Использование if-else упрощает логику ветвления, исключая избыточные проверки.
+Это улучшает читаемость и немного снижает нагрузку.
+Оценка кода до рефакторинга: 5/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0009() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int i = 0;
+    while (i < 5) {
+        printf("%d ", i);
+        i++;
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0009() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Замена цикла while на for улучшает читаемость и соответствует распространённым стилям кодирования.
+Производительность практически не меняется.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0010() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int result = 0;
+    for (int i = 1; i <= n; i++) {
+        result += i * i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum of squares: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0010() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    // Формула суммы квадратов: n(n+1)(2n+1)/6
+    int result = n * (n + 1) * (2 * n + 1) / 6;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum of squares: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Вместо цикла используется математическая формула для вычисления суммы квадратов, что значительно ускоряет вычисление.
+Оценка кода до рефакторинга: 5/10
+Оценка кода после рефакторинга: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0011() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 20;
+    int temp = x;
+    x = y;
+    y = temp;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("x = %d, y = %d\n", x, y);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0011() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 20;
+    x = x + y;
+    y = x - y;
+    x = x - y;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("x = %d, y = %d\n", x, y);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг использует арифметические операции для обмена значений без дополнительной переменной.
+Это уменьшает использование памяти, но может быть менее читаемо.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0012() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[20];
+    strcpy(str, "Hello");
+    strcat(str, " World");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("%s\n", str);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0012() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[20] = "Hello";
+    strcat(str, " World");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("%s\n", str);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг инициализирует строку при объявлении, убирая вызов strcpy, что упрощает код.
+Производительность незначительно улучшается за счёт сокращения вызовов функций.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int is_even(int num) {
+    return num % 2 == 0;
+}
+
+void before_example0013() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int number = 4;
+    int result;
+    if (number % 2 == 0) {
+        result = 1;
+    } else {
+        result = 0;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Is even: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0013() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int number = 4;
+    int result = is_even(number);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Is even: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Вынесение проверки чётности в отдельную функцию улучшает читаемость и повторное использование.
+Производительность практически не меняется.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0014() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    int min;
+    if (a < b) {
+        min = a;
+    } else {
+        min = b;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Min: %d\n", min);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0014() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    int min = (a < b) ? a : b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Min: %d\n", min);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг упрощает выбор минимального значения через тернарный оператор, сокращая код и улучшая читаемость.
+Временные затраты минимальны.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int square(int x) {
+    return x * x;
+}
+
+void before_example0015() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 7;
+    int result = x * x;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Square: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0015() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 7;
+    int result = square(x);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Square: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Выделение операции возведения в квадрат в функцию повышает читаемость и удобство повторного использования.
+Разница в производительности минимальна.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0016() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int count = 0;
+    while (count < 5) {
+        printf("%d ", count);
+        count++;
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0016() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Использование цикла for вместо while улучшает читаемость и структуру кода.
+Производительность в данном случае практически не меняется.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0017() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 5;
+    int sum = 0;
+    for (int i = 1; i <= n; i++) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0017() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 5;
+    int sum = n * (n + 1) / 2;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Использование формулы суммы арифметической прогрессии вместо цикла существенно повышает производительность.
+Оценка кода до рефакторинга: 5/10
+Оценка кода после рефакторинга: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0018() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int factorial = 1;
+    for (int i = 1; i <= n; i++) {
+        factorial *= i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Factorial: %d\n", factorial);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+int factorial_recursive(int n) {
+    if (n <= 1) return 1;
+    return n * factorial_recursive(n - 1);
+}
+
+void after_example0018() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int factorial = factorial_recursive(n);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Factorial: %d\n", factorial);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Рефакторинг заменяет итеративный цикл рекурсивной функцией. Это улучшает читаемость и демонстрирует структурный подход.
+Производительность может снизиться из-за рекурсии, но для небольших n это приемлемо.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0019() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[50];
+    strcpy(str, "Test");
+    strcat(str, " String");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("%s\n", str);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0019() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[50] = "Test String";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("%s\n", str);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Инициализация строки сразу значением вместо копирования и конкатенации упрощает код и немного ускоряет выполнение.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0020() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int array[5] = {5, 10, 15, 20, 25};
+    int sum = 0;
+    for (int i = 0; i < 5; i++) {
+        sum += array[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0020() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int array[5] = {5, 10, 15, 20, 25};
+    int sum = 0;
+    int *ptr = array;
+    int *end_ptr = array + 5;
+    while (ptr < end_ptr) {
+        sum += *ptr++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Замена индексации массива на использование указателей улучшает низкоуровневое понимание и может повысить производительность на некоторых платформах.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0021() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (x == 0) {
+        x = 1;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+    printf("x = %d\n", x);
+    printf("Время до рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+void after_example0021() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    x = (x == 0) ? 1 : x;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    long long duration_ns = diff_in_ns(start, end);
+    printf("x = %d\n", x);
+    printf("Время после рефакторинга: %lld наносекунд\n", duration_ns);
+}
+
+/*
+Описание:
+Использование тернарного оператора вместо if упрощает присваивание, повышая компактность и читаемость.
+Производительность незначительно улучшается.
+Оценка кода до рефакторинга: 5/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0022() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[3] = {1, 2, 3};
+    for (int i = 0; i < 3; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0022() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[3] = {1, 2, 3};
+    for (int *p = arr; p < arr + 3; p++) {
+        printf("%d ", *p);
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Переход с индексного обращения к массиву на указатели улучшает понимание низкоуровневого доступа.
+Производительность в малых циклах может немного повыситься.
+Оценка кода до рефакторинга: 6/10
+Оценка кода после рефакторинга: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0023() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int sum = 0;
+    int i = 1;
+    while (i <= n) {
+        sum += i;
+        i++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0023() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int sum = n * (n + 1) / 2;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена цикла вычислением формулы арифметической прогрессии значительно улучшает производительность.
+Оценка до: 5/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0024() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[50];
+    strcpy(str, "Hello");
+    strcat(str, ", World!");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", str);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0024() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char str[50] = "Hello, World!";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", str);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Инициализация строки сразу значением заменяет два вызова функций, упрощая код и слегка ускоряя.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int max_int(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+void before_example0025() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 8, b = 12;
+    int max;
+    if (a > b) {
+        max = a;
+    } else {
+        max = b;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", max);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0025() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 8, b = 12;
+    int max = max_int(a, b);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", max);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Вынос логики выбора максимума в функцию повышает читаемость и облегчает поддержку.
+Производительность незначительно изменяется.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0026() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 1; i <= 100; i++) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0026() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 100;
+    int sum = n * (n + 1) / 2;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Оптимизация вычисления суммы чисел заменой цикла формулой значительно улучшает производительность.
+Оценка до: 5/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int factorial_iter(int n) {
+    int res = 1;
+    for (int i = 1; i <= n; i++) {
+        res *= i;
+    }
+    return res;
+}
+
+void before_example0027() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int result = 1;
+    int n = 6;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Factorial: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0027() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 6;
+    int result = factorial_iter(n);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Factorial: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Вынесение цикла факториала в функцию улучшает структуру и позволяет повторное использование.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0028() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char dest[20];
+    char *src = "Example";
+    for (int i = 0; src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    dest[7] = '\0';
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", dest);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0028() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char dest[20];
+    strcpy(dest, "Example");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", dest);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена ручного копирования строки функцией strcpy упрощает и делает код безопаснее.
+Оценка до: 5/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0029() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 4, b = 5;
+    int c;
+    if (a > b) {
+        c = a;
+    } else {
+        c = b;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", c);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0029() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 4, b = 5;
+    int c = (a > b) ? a : b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", c);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование тернарного оператора упрощает код и повышает читаемость.
+Оценка до: 5/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0030() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int array[4] = {1, 2, 3, 4};
+    int sum = 0;
+    for (int i = 0; i < 4; i++) {
+        sum += array[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0030() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int array[4] = {1, 2, 3, 4};
+    int *p = array;
+    int *end_p = array + 4;
+    int sum = 0;
+    while (p < end_p) {
+        sum += *p++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена цикла for на использование указателей для обхода массива — улучшение низкоуровневого кода.
+Оценка до: 6/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0031() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int i = 0;
+    int sum = 0;
+    while (i < 10) {
+        sum += i;
+        i++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0031() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 9;
+    int sum = n * (n + 1) / 2;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Sum: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Цикл while заменён формулой суммы арифметической прогрессии — улучшение производительности и читаемости.
+Оценка до: 5/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0032() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s[20];
+    s[0] = 'A';
+    s[1] = 'B';
+    s[2] = 'C';
+    s[3] = '\0';
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0032() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s[] = "ABC";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Инициализация массива символов строкой сокращает и упрощает код.
+Оценка до: 4/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0033() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 2, b = 3, c;
+    c = a * b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Product: %d\n", c);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0033() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int product = 2 * 3;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Product: %d\n", product);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Присваивание результата выражения напрямую упрощает код.
+Оценка до: 5/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int square(int x) {
+    return x * x;
+}
+
+void before_example0034() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5;
+    int result = x * x;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Square: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0034() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5;
+    int result = square(x);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Square: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Вынесение повторяющейся операции в функцию повышает читаемость и удобство поддержки.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0035() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5] = {1,2,3,4,5};
+    int total = 0;
+    for (int i=0; i<5; i++) {
+        total += arr[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Total: %d\n", total);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0035() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[5] = {1,2,3,4,5};
+    int *ptr = arr;
+    int *end_ptr = arr + 5;
+    int total = 0;
+    while (ptr < end_ptr) {
+        total += *ptr++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Total: %d\n", total);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование указателей для обхода массива может улучшить производительность и читабельность.
+Оценка до: 6/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0036() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s1[10] = "Hello";
+    char s2[10] = "World";
+    char result[20];
+    strcpy(result, s1);
+    strcat(result, " ");
+    strcat(result, s2);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0036() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char result[20] = "Hello World";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена нескольких операций копирования и конкатенации инициализацией упрощает код и повышает скорость.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0037() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 10, b = 3;
+    int result = a / b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Division result: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0037() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 10, b = 3;
+    int result = a / b; // тот же код, но можно добавить функцию при повторении
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Division result: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+В данном случае рефакторинг незначителен, но можно выделить в функцию для повторного использования.
+Оценка до: 5/10, после: 5/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0038() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int flag = 0;
+    if (flag == 0) {
+        printf("Flag is zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0038() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int flag = 0;
+    if (!flag) {
+        printf("Flag is zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Упрощение условия if повышает читаемость, избавляя от сравнения с нулём.
+Оценка до: 5/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0039() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 20;
+    int max;
+    if (x > y) {
+        max = x;
+    } else {
+        max = y;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", max);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0039() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 20;
+    int max = (x > y) ? x : y;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Max: %d\n", max);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Заменён блок if-else на тернарный оператор для сокращения и повышения читаемости.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0040() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int factorial = 1;
+    for (int i = 1; i <= n; i++) {
+        factorial *= i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Factorial: %d\n", factorial);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+int factorial_func(int n) {
+    if (n == 0 || n == 1)
+        return 1;
+    else
+        return n * factorial_func(n - 1);
+}
+
+void after_example0040() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 10;
+    int factorial = factorial_func(n);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Factorial: %d\n", factorial);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Вынесение вычисления факториала в рекурсивную функцию улучшает структуру и переиспользуемость кода.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0041() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (x == 0) {
+        printf("x равно нулю\n");
+    } else {
+        printf("x не равно нулю\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0041() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (!x) {
+        printf("x равно нулю\n");
+    } else {
+        printf("x не равно нулю\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование логического отрицания упрощает условие и улучшает читаемость кода.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0042() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[3] = {1, 2, 3};
+    int sum = 0;
+    for (int i = 0; i < 3; i++) {
+        sum += arr[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0042() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[] = {1, 2, 3};
+    int sum = 0;
+    for (int *ptr = arr; ptr < arr + sizeof(arr) / sizeof(arr[0]); ptr++) {
+        sum += *ptr;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование указателей для обхода массива улучшает выразительность и часто оптимизируется компилятором лучше.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int is_even(int n) {
+    return (n % 2) == 0;
+}
+
+void before_example0043() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 4;
+    int result;
+    if ((n % 2) == 0) {
+        result = 1;
+    } else {
+        result = 0;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Чётное: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0043() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 4;
+    int result = is_even(n);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Чётное: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Вынесение проверки чётности в функцию повышает читаемость и позволяет переиспользовать код.
+Оценка до: 5/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0044() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 5;
+    int max;
+    if (x > y) {
+        max = x;
+    } else {
+        max = y;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Максимум: %d\n", max);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0044() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 10;
+    int y = 5;
+    int max = (x > y) ? x : y;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Максимум: %d\n", max);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование тернарного оператора сокращает код и повышает его читаемость.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0045() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s1[10] = "Hello";
+    char s2[10] = "World";
+    char s3[20];
+    strcpy(s3, s1);
+    strcat(s3, " ");
+    strcat(s3, s2);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0045() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s3[] = "Hello World";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Прямая инициализация строки заменяет несколько вызовов строковых функций, улучшая читаемость и скорость.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0046() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int i = 0;
+    while (i < 5) {
+        printf("%d\n", i);
+        i++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0046() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    for (int i = 0; i < 5; i++) {
+        printf("%d\n", i);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Цикл while заменён на for, что улучшает читаемость и уменьшает вероятность ошибок с инкрементом.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0047() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[3] = {1, 2, 3};
+    int sum = 0;
+    for (int i = 0; i < 3; i++) {
+        sum = sum + arr[i];
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0047() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int arr[] = {1, 2, 3};
+    int sum = 0;
+    for (int *p = arr; p < arr + sizeof(arr) / sizeof(arr[0]); p++) {
+        sum += *p;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование указателей при обходе массива часто повышает производительность и улучшает читаемость.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0048() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5;
+    int y = 0;
+    int result;
+    if (y != 0) {
+        result = x / y;
+    } else {
+        result = 0;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Результат: %d\n", result);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0048() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5;
+    int y = 0;
+    int result = (y != 0) ? (x / y) : 0;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Результат: %d\n", result);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Заменён if-else на тернарный оператор для компактности и улучшения читаемости.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0049() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s1[50] = "Привет, ";
+    char s2[50] = "мир!";
+    char s3[100];
+    strcpy(s3, s1);
+    strcat(s3, s2);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0049() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s3[] = "Привет, мир!";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Прямая инициализация строки вместо нескольких операций копирования и конкатенации улучшает производительность и читабельность.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0050() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 1; i <= 100; i++) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма от 1 до 100: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0050() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 100;
+    int sum = n * (n + 1) / 2;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма от 1 до 100: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена цикла формулой для суммы арифметической прогрессии улучшает производительность и упрощает код.
+Оценка до: 5/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0051() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int i = 0;
+    while (i < 10) {
+        printf("%d\n", i);
+        i++;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0051() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    for (int i = 0; i < 10; i++) {
+        printf("%d\n", i);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Замена цикла while на for делает код компактнее и снижает вероятность ошибки с инкрементом.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0052() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5, y = 10;
+    int max;
+    if (x > y) {
+        max = x;
+    } else {
+        max = y;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Максимум: %d\n", max);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0052() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 5, y = 10;
+    int max = (x > y) ? x : y;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Максимум: %d\n", max);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование тернарного оператора сокращает код, повышая читаемость и простоту поддержки.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0053() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s1[20] = "Good ";
+    char s2[20] = "morning";
+    char s3[50];
+    strcpy(s3, s1);
+    strcat(s3, s2);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0053() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s3[] = "Good morning";
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%s\n", s3);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Прямая инициализация строки уменьшает число операций копирования, упрощая и ускоряя код.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+int factorial_before(int n) {
+    if (n <= 1) return 1;
+    return n * factorial_before(n - 1);
+}
+
+int factorial_after(int n) {
+    int result = 1;
+    for (int i = 2; i <= n; i++)
+        result *= i;
+    return result;
+}
+
+void before_example0054() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int res = factorial_before(5);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Факториал (до): %d\n", res);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0054() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int res = factorial_after(5);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Факториал (после): %d\n", res);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Рекурсивный вычисление заменено на итеративное для улучшения производительности и снижения риска переполнения стека.
+Оценка до: 6/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0055() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (x == 0) {
+        printf("Zero\n");
+    } else {
+        printf("Non-zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0055() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int x = 0;
+    if (!x) {
+        printf("Zero\n");
+    } else {
+        printf("Non-zero\n");
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование логического отрицания улучшает читаемость и краткость.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0056() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 0; i < 10; i++) {
+        sum = sum + i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0056() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int sum = 0;
+    for (int i = 0; i < 10; i++) {
+        sum += i;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Сумма: %d\n", sum);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование оператора += улучшает читаемость и соответствует современному стилю кодирования.
+Оценка до: 6/10, после: 7/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0057() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("a = %d, b = %d\n", a, b);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0057() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int a = 5;
+    int b = 10;
+    a ^= b;
+    b ^= a;
+    a ^= b;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("a = %d, b = %d\n", a, b);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Обмен значениями с помощью XOR без временной переменной экономит память, но требует понимания битовых операций.
+Оценка до: 7/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0058() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int i = 0;
+    while (i < 10) {
+        printf("%d ", i);
+        i++;
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0058() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    for (int i = 0; i < 10; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Цикл for удобнее и лучше контролируется, особенно в подобных ситуациях.
+Оценка до: 6/10, после: 8/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0059() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 16;
+    int res = 1;
+    for (int i = 0; i < n; i++) {
+        res *= 2;
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("2^%d = %d\n", n, res);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0059() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    int n = 16;
+    int res = 1 << n;
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("2^%d = %d\n", n, res);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Использование побитового сдвига вместо цикла улучшает скорость и компактность кода.
+Оценка до: 5/10, после: 9/10
+*/
+
+#include <stdio.h>
+#include <time.h>
+
+static inline long long diff_in_ns(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec)*1000000000LL + (end.tv_nsec - start.tv_nsec);
+}
+
+void before_example0060() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s[100];
+    int i;
+    for (i = 0; i < 5; i++) {
+        s[i] = 'a' + i;
+    }
+    s[i] = '\0';
+    printf("%s\n", s);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время до рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+void after_example0060() {
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    char s[] = "abcde";
+    printf("%s\n", s);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("Время после рефакторинга: %lld наносекунд\n", diff_in_ns(start, end));
+}
+
+/*
+Описание:
+Инициализация строки литералом упрощает и ускоряет выполнение, устраняя ненужный цикл.
+Оценка до: 6/10, после: 8/10
+*/
