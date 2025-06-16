@@ -1,124 +1,162 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <windows.h>
 
 #define MAX_LINE_LEN 1024
 #define MAX_CHECKS 10
+#define MAX_PATH_LEN 260
+#define MAX_LOG_BUFFER 8192
 
-// Прототипы функций проверок из example.c
+// Прототипы функций проверок
 int after_example_0001(const char* line, char* advice, size_t advice_len);
 int after_example_0002(const char* line, char* advice, size_t advice_len);
-int after_example_0003(const char* line, char* advice, size_t advice_len);
-int after_example_0004(const char* line, char* advice, size_t advice_len);
-int after_example_0005(const char* line, char* advice, size_t advice_len);
-int after_example_0006(const char* line, char* advice, size_t advice_len);
-int after_example_0007(const char* line, char* advice, size_t advice_len);
-int after_example_0008(const char* line, char* advice, size_t advice_len);
-int after_example_0009(const char* line, char* advice, size_t advice_len);
-int after_example_0010(const char* line, char* advice, size_t advice_len);
 
-// Массив указателей на функции проверок
+// Тип функции
 typedef int (*CheckFunc)(const char*, char*, size_t);
+
 CheckFunc checks_array[MAX_CHECKS] = {
-    after_example_0001,
-    after_example_0002,
-    after_example_0003,
-    after_example_0004,
-    after_example_0005,
-    after_example_0006,
-    after_example_0007,
-    after_example_0008,
-    after_example_0009,
-    after_example_0010
+    after_example_0001, after_example_0002,
+    after_example_0003, after_example_0004,
+    after_example_0005, after_example_0006,
+    after_example_0007, after_example_0008,
+    after_example_0009, after_example_0010
 };
 
-// Возвращает текущее время в формате "HH:MM:SS"
+// ====================== ЛОГИРОВАНИЕ =========================
+
+CRITICAL_SECTION log_lock;
+char log_buffer[MAX_LOG_BUFFER];
+size_t log_offset = 0;
+
 void current_time_str(char* buffer, size_t size) {
     time_t now = time(NULL);
-    struct tm *tm_info = localtime(&now);
-    strftime(buffer, size, "%H:%M:%S", tm_info);
+    struct tm* t = localtime(&now);
+    strftime(buffer, size, "%H:%M:%S", t);
 }
 
-// Записывает сообщение в log.txt
-void write_log(const char* file_name, int line_num, const char* line, const char* advice) {
-    FILE* log = fopen("log.txt", "a");
-    if (!log) return;
+void buffered_log(const char* file_name, int line_num, const char* line, const char* advice) {
+    EnterCriticalSection(&log_lock);
 
     char time_str[16];
     current_time_str(time_str, sizeof(time_str));
-    fprintf(log, "[%s] %s:%d: %s\nAdvice: %s\n\n", time_str, file_name, line_num, line, advice);
-    fclose(log);
+
+    char temp[512];
+    int len = snprintf(temp, sizeof(temp), "[%s] %s:%d: %sAdvice: %s\n\n", time_str, file_name, line_num, line, advice);
+
+    if (log_offset + len < MAX_LOG_BUFFER) {
+        memcpy(log_buffer + log_offset, temp, len);
+        log_offset += len;
+    }
+
+    LeaveCriticalSection(&log_lock);
 }
 
-// Обработка одного файла
+void flush_logs(const char* log_file) {
+    EnterCriticalSection(&log_lock);
+
+    FILE* f = fopen(log_file, "a");
+    if (f) {
+        fwrite(log_buffer, 1, log_offset, f);
+        fclose(f);
+    }
+    log_offset = 0;
+
+    LeaveCriticalSection(&log_lock);
+}
+
+// ====================== ОБРАБОТКА ФАЙЛА =========================
+
+DWORD WINAPI process_file_thread(LPVOID lpParam);
+
+typedef struct {
+    char filepath[MAX_PATH_LEN];
+} ThreadParam;
+
 void process_file(const char* file_path) {
     FILE* f = fopen(file_path, "r");
-    if (!f) {
-        printf("Не удалось открыть файл %s\n", file_path);
-        return;
-    }
+    if (!f) return;
 
     char line[MAX_LINE_LEN];
     int line_num = 0;
 
     while (fgets(line, sizeof(line), f)) {
         line_num++;
+        line[strcspn(line, "\r\n")] = 0;
 
-        for (int i = 0; i < MAX_CHECKS; i++) {
-            char advice[256] = {0};
+        for (int i = 0; i < MAX_CHECKS; ++i) {
+            char advice[256] = { 0 };
             int result = checks_array[i](line, advice, sizeof(advice));
 
-            if (result) {
-                printf("ок\n");
-            } else {
-                write_log(file_path, line_num, line, advice);
+            if (!result) {
+                buffered_log(file_path, line_num, line, advice);
             }
         }
     }
     fclose(f);
 }
 
-// Поиск файлов с расширением .c и .h в каталоге c:\1000
-void find_and_process_files(const char* directory) {
-    WIN32_FIND_DATA findFileData;
-    HANDLE hFind = INVALID_HANDLE_VALUE;
-    char search_path[MAX_PATH];
-
-    // Файлы .c
-    snprintf(search_path, MAX_PATH, "%s\\*.c", directory);
-    hFind = FindFirstFile(search_path, &findFileData);
-
-    if (hFind == INVALID_HANDLE_VALUE) {
-        printf("Файлы .c не найдены в %s\n", directory);
-    } else {
-        do {
-            char full_path[MAX_PATH];
-            snprintf(full_path, MAX_PATH, "%s\\%s", directory, findFileData.cFileName);
-            process_file(full_path);
-        } while (FindNextFile(hFind, &findFileData) != 0);
-        FindClose(hFind);
-    }
-
-    // Файлы .h
-    snprintf(search_path, MAX_PATH, "%s\\*.h", directory);
-    hFind = FindFirstFile(search_path, &findFileData);
-
-    if (hFind == INVALID_HANDLE_VALUE) {
-        printf("Файлы .h не найдены в %s\n", directory);
-    } else {
-        do {
-            char full_path[MAX_PATH];
-            snprintf(full_path, MAX_PATH, "%s\\%s", directory, findFileData.cFileName);
-            process_file(full_path);
-        } while (FindNextFile(hFind, &findFileData) != 0);
-        FindClose(hFind);
-    }
-}
-
-int main() {
-    find_and_process_files("c:\\1000");
+DWORD WINAPI process_file_thread(LPVOID lpParam) {
+    ThreadParam* param = (ThreadParam*)lpParam;
+    process_file(param->filepath);
+    free(param);
     return 0;
 }
-\
+
+// ====================== РЕКУРСИВНЫЙ ПОИСК ФАЙЛОВ =========================
+
+void process_directory(const char* directory, const char* extension) {
+    WIN32_FIND_DATA ffd;
+    HANDLE hFind;
+    char search_path[MAX_PATH];
+
+    snprintf(search_path, MAX_PATH, "%s\\*", directory);
+    hFind = FindFirstFileEx(search_path, FindExInfoBasic, &ffd, FindExSearchNameMatch, NULL, FIND_FIRST_EX_LARGE_FETCH);
+
+    if (hFind == INVALID_HANDLE_VALUE) return;
+
+    do {
+        if (strcmp(ffd.cFileName, ".") == 0 || strcmp(ffd.cFileName, "..") == 0) continue;
+
+        char full_path[MAX_PATH];
+        snprintf(full_path, MAX_PATH, "%s\\%s", directory, ffd.cFileName);
+
+        if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            process_directory(full_path, extension);  // рекурсивный вызов
+        } else if (strstr(ffd.cFileName, extension)) {
+            ThreadParam* param = malloc(sizeof(ThreadParam));
+            strncpy(param->filepath, full_path, MAX_PATH_LEN);
+            CreateThread(NULL, 0, process_file_thread, param, 0, NULL);
+        }
+
+    } while (FindNextFile(hFind, &ffd));
+
+    FindClose(hFind);
+}
+
+// ====================== MAIN =========================
+
+int main(int argc, char* argv[]) {
+    const char* target_dir = "c:\\1000";
+    const char* extension = ".c";
+    const char* log_file = "log.txt";
+
+    if (argc >= 2) target_dir = argv[1];
+    if (argc >= 3) extension = argv[2];
+
+    InitializeCriticalSection(&log_lock);
+    printf("Сканирование директории: %s (файлы *%s)\n", target_dir, extension);
+
+    process_directory(target_dir, extension);
+
+    // Подождать, чтобы потоки завершились (упрощённо)
+    Sleep(3000);
+
+    flush_logs(log_file);
+    DeleteCriticalSection(&log_lock);
+
+    printf("Завершено. Логи записаны в %s\n", log_file);
+    return 0;
+}
